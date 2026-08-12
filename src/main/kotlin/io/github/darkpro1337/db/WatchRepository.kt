@@ -1,18 +1,9 @@
 package io.github.darkpro1337.db
 
-import io.github.darkpro1337.db.tables.SeenJobsTable
-import io.github.darkpro1337.db.tables.UsersTable
-import io.github.darkpro1337.db.tables.WatchMetadataFiltersTable
-import io.github.darkpro1337.db.tables.WatchOfficeFiltersTable
-import io.github.darkpro1337.db.tables.WatchesTable
+import io.github.darkpro1337.db.tables.*
 import io.github.darkpro1337.greenhouse.WatchFilters
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.insertIgnore
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.jetbrains.exposed.sql.update
 
 data class OfficeFilterRecord(
     val officeId: Long,
