@@ -1,0 +1,52 @@
+{
+  "jobs": [
+    {
+      "id": 4901288101,
+      "title": "AI Technical Lead - C++ Ecosystem",
+      "absolute_url": "https://job-boards.eu.greenhouse.io/jetbrains/jobs/4901288101",
+      "location": { "name": "Yerevan, Armenia" },
+      "offices": [
+        { "id": 4029421101, "name": "Armenia", "location": null, "parent_id": null, "child_ids": [4029422101] }
+      ],
+      "metadata": [
+        { "id": 11295787101, "name": "Job Category", "value": "Software Development", "value_type": "single_select" }
+      ]
+    },
+    {
+      "id": 4696977101,
+      "title": "Build Infrastructure Engineer",
+      "absolute_url": "https://job-boards.eu.greenhouse.io/jetbrains/jobs/4696977101",
+      "location": { "name": "Yerevan, Armenia" },
+      "offices": [
+        { "id": 4029421101, "name": "Armenia", "location": null, "parent_id": null, "child_ids": [] }
+      ],
+      "metadata": [
+        { "id": 11295787101, "name": "Job Category", "value": "IT/DevOps", "value_type": "single_select" }
+      ]
+    },
+    {
+      "id": 4881348101,
+      "title": "Account Manager (China)",
+      "absolute_url": "https://job-boards.eu.greenhouse.io/jetbrains/jobs/4881348101",
+      "location": { "name": "Shanghai, China" },
+      "offices": [
+        { "id": 4029424101, "name": "Shanghai", "location": null, "parent_id": null, "child_ids": [] }
+      ],
+      "metadata": [
+        { "id": 11295787101, "name": "Job Category", "value": "Sales", "value_type": "single_select" }
+      ]
+    },
+    {
+      "id": 1001,
+      "title": "Backend Engineer Serbia",
+      "absolute_url": "https://job-boards.eu.greenhouse.io/jetbrains/jobs/1001",
+      "location": { "name": "Belgrade, Serbia" },
+      "offices": [
+        { "id": 4025591101, "name": "Serbia", "location": null, "parent_id": null, "child_ids": [] }
+      ],
+      "metadata": [
+        { "id": 11295787101, "name": "Job Category", "value": "Software Development", "value_type": "single_select" }
+      ]
+    }
+  ]
+}
