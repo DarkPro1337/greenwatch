@@ -11,13 +11,11 @@ RUN chmod +x gradlew && ./gradlew --no-daemon installDist
 FROM eclipse-temurin:26-jre
 WORKDIR /app
 
-RUN useradd --system --uid 1000 --create-home greenwatch \
-    && mkdir -p /data \
-    && chown -R greenwatch:greenwatch /app /data
+RUN mkdir -p /data && chown -R 1000:1000 /app /data
 
-COPY --from=build --chown=greenwatch:greenwatch /src/build/install/greenwatch /app
+COPY --from=build --chown=1000:1000 /src/build/install/greenwatch /app
 
-USER greenwatch
+USER 1000
 ENV DATABASE_PATH=/data/greenwatch.db
 VOLUME /data
 
