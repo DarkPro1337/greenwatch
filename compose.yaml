@@ -3,6 +3,7 @@ services:
     image: ghcr.io/darkpro1337/greenwatch:${GREENWATCH_TAG:-latest}
     container_name: greenwatch
     restart: unless-stopped
+    network_mode: host
     env_file: .env
     environment:
       DATABASE_PATH: /data/greenwatch.db
