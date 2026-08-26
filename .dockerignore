@@ -1,0 +1,15 @@
+.git
+.github
+.idea
+.gradle
+.kotlin
+build
+out
+*.md
+.env
+.env.example
+compose.yaml
+*.db
+*.db-shm
+*.db-wal
+.DS_Store

@@ -69,6 +69,73 @@ When you create a watch, current matches are marked as seen so you are not flood
 ./gradlew run
 ```
 
+## Deploy
+
+Push to `main` builds a Docker image (JDK 26), pushes it to GHCR, and restarts the container over SSH.
+
+### One-time: VPS
+
+SSH in as an admin user, then create a dedicated `deploy` account (no sudo) and put the CI public key in **that** user’s `authorized_keys`:
+
+```bash
+sudo adduser --disabled-password --gecos "" deploy
+sudo usermod -aG docker deploy
+
+sudo mkdir -p /usr/local/lib/docker/cli-plugins
+sudo curl -fsSL "https://github.com/docker/compose/releases/download/v2.32.4/docker-compose-linux-x86_64" \
+  -o /usr/local/lib/docker/cli-plugins/docker-compose
+sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+
+sudo mkdir -p /opt/greenwatch/data /home/deploy/.ssh
+sudo chown -R deploy:deploy /opt/greenwatch /home/deploy/.ssh
+sudo chmod 700 /home/deploy/.ssh
+# container process is uid 1000; data dir must be writable by that uid
+sudo chown 1000:1000 /opt/greenwatch/data
+
+sudo nano /home/deploy/.ssh/authorized_keys   # paste the CI public key
+sudo chmod 600 /home/deploy/.ssh/authorized_keys
+sudo chown deploy:deploy /home/deploy/.ssh/authorized_keys
+
+sudo nano /opt/greenwatch/.env               # BOT_TOKEN=...
+sudo chown deploy:deploy /opt/greenwatch/.env
+sudo chmod 600 /opt/greenwatch/.env
+```
+
+`.env` stays on the server and is never overwritten by CI. SQLite lives in `/opt/greenwatch/data`.
+
+### One-time: GitHub
+
+1. Generate a deploy key on your laptop (do not reuse your personal SSH key):
+
+   ```bash
+   ssh-keygen -t ed25519 -f greenwatch-deploy -N "" -C "github-actions-greenwatch"
+   ```
+
+   Put `greenwatch-deploy.pub` on the VPS (`authorized_keys` above).  
+   Put the **private** key into a GitHub secret. Delete the local private key when done if you do not need it.
+
+2. Repo **Settings → Secrets and variables → Actions**:
+
+   | Secret            | Value                           |
+   |-------------------|---------------------------------|
+   | `SSH_HOST`        | VPS IP                          |
+   | `SSH_USER`        | `deploy`                        |
+   | `SSH_PRIVATE_KEY` | contents of `greenwatch-deploy` |
+   | `SSH_PORT`        | `22` (optional)                 |
+
+3. After the first successful image push: GitHub → **Packages** → `greenwatch` → Package settings → link it to this repository (needed so Actions can pull with `GITHUB_TOKEN`). If the pull on the VPS returns 403, make the package public or leave it private and keep the login step in the workflow.
+
+`BOT_TOKEN` is **not** a GitHub secret; it stays in `/opt/greenwatch/.env`.
+
+### Ship it
+
+Merge or push to `main`, or run **Actions → Deploy → Run workflow**. Check:
+
+```bash
+docker compose -f /opt/greenwatch/compose.yaml ps
+docker logs -f greenwatch
+```
+
 ## Stack
 
 Kotlin, kotlin-telegram-bot, Ktor Client, kotlinx.serialization, Exposed, SQLite.
