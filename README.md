@@ -89,7 +89,7 @@ sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
 sudo mkdir -p /opt/greenwatch/data /home/deploy/.ssh
 sudo chown -R deploy:deploy /opt/greenwatch /home/deploy/.ssh
 sudo chmod 700 /home/deploy/.ssh
-# container process is uid 1000; data dir must be writable by that uid
+# bind-mounted SQLite dir; the image entrypoint chowns it to uid 1000 on start
 sudo chown 1000:1000 /opt/greenwatch/data
 
 sudo nano /home/deploy/.ssh/authorized_keys   # paste the CI public key

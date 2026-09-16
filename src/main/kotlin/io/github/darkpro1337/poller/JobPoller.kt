@@ -11,6 +11,7 @@ import io.github.darkpro1337.greenhouse.GreenhouseClient
 import io.github.darkpro1337.greenhouse.JobMatcher
 import io.github.darkpro1337.greenhouse.dto.GreenhouseJob
 import io.github.darkpro1337.logger
+import io.github.darkpro1337.net.isTransientNetworkFailure
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -48,7 +49,11 @@ class JobPoller(
             val jobs = try {
                 greenhouseClient.listJobs(boardToken, content = true)
             } catch (e: Exception) {
-                log.error("Failed to fetch board {}: {}", boardToken, e.message, e)
+                if (isTransientNetworkFailure(e)) {
+                    log.warn("Failed to fetch board {}: {}", boardToken, e.message)
+                } else {
+                    log.error("Failed to fetch board {}: {}", boardToken, e.message, e)
+                }
                 return@forEach
             }
 

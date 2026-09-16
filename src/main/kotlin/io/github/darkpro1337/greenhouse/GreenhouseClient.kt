@@ -2,9 +2,13 @@ package io.github.darkpro1337.greenhouse
 
 import io.github.darkpro1337.greenhouse.dto.GreenhouseJob
 import io.github.darkpro1337.greenhouse.dto.JobsResponse
+import io.github.darkpro1337.net.isRetryableHttpStatus
+import io.github.darkpro1337.net.isTransientNetworkFailure
 import io.ktor.client.HttpClient
+import io.ktor.client.HttpClientConfig
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
@@ -51,6 +55,8 @@ class GreenhouseClient(
                 connectTimeoutMillis = 15_000
                 socketTimeoutMillis = 60_000
             }
+
+            installGreenhouseRetries()
         }
 
         fun normalizeToken(raw: String): String {
@@ -65,6 +71,15 @@ class GreenhouseClient(
                 .lowercase()
                 .also { require(it.matches(Regex("""[a-z0-9_-]+"""))) { "Invalid board token: $raw" } }
         }
+    }
+}
+
+internal fun HttpClientConfig<*>.installGreenhouseRetries() {
+    install(HttpRequestRetry) {
+        maxRetries = 3
+        retryOnExceptionIf { _, cause -> isTransientNetworkFailure(cause) }
+        retryIf { _, response -> isRetryableHttpStatus(response.status.value) }
+        exponentialDelay(base = 2.0, maxDelayMs = 8_000)
     }
 }
 

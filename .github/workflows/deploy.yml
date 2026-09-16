@@ -76,6 +76,7 @@ jobs:
           script: |
             set -euo pipefail
             cd /opt/greenwatch
+            mkdir -p /opt/greenwatch/data
             echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
             export GREENWATCH_TAG
             if docker compose version >/dev/null 2>&1; then

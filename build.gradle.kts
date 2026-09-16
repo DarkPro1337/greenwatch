@@ -48,6 +48,7 @@ dependencies {
 
     testImplementation(kotlin("test"))
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.11.0")
+    testImplementation("io.ktor:ktor-client-mock:$ktorVersion")
 
     constraints {
         implementation("com.squareup.okhttp3:okhttp:$okHttpVersion")

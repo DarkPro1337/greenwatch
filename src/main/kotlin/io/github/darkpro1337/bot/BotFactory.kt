@@ -16,10 +16,14 @@ import io.github.darkpro1337.db.WatchRepository
 import io.github.darkpro1337.greenhouse.GreenhouseClient
 import io.github.darkpro1337.greenhouse.JobMatcher
 import io.github.darkpro1337.logger
+import io.github.darkpro1337.log.LogThrottle
 import io.github.darkpro1337.poller.JobPoller
+import io.github.darkpro1337.retry.ExponentialBackoff
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class BotFactory(
     private val botToken: String,
@@ -31,6 +35,12 @@ class BotFactory(
     private val log = logger()
     private val sessions = WizardSessionStore()
     private val wizard = AddWatchWizard(greenhouseClient, watchRepository, sessions, scope)
+    private val pollingErrors = TelegramPollingErrorHandler(
+        logThrottle = LogThrottle(5.minutes),
+        backoff = ExponentialBackoff(initial = 1.seconds, max = 30.seconds),
+        warn = { log.warn("Telegram polling error: {}", it) },
+        sleep = { Thread.sleep(it.inWholeMilliseconds) },
+    )
 
     fun create(): Pair<com.github.kotlintelegrambot.Bot, JobPoller> {
         lateinit var poller: JobPoller
@@ -159,7 +169,7 @@ class BotFactory(
                 }
 
                 telegramError {
-                    log.error("Telegram error: {}", error.getErrorMessage())
+                    pollingErrors.onError(error)
                 }
             }
         }

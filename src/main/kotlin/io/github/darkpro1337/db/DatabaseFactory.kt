@@ -9,13 +9,17 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.io.File
 import java.sql.Connection
 
 object DatabaseFactory {
     fun init(databasePath: String) {
         val url = when {
             databasePath.startsWith("jdbc:") -> databasePath
-            else -> "jdbc:sqlite:$databasePath?foreign_keys=on&journal_mode=WAL"
+            else -> {
+                ensureWritableDatabaseFile(databasePath)
+                "jdbc:sqlite:$databasePath?foreign_keys=on&journal_mode=WAL"
+            }
         }
 
         Database.connect(url, driver = "org.sqlite.JDBC")
@@ -27,6 +31,20 @@ object DatabaseFactory {
                 WatchOfficeFiltersTable,
                 WatchMetadataFiltersTable,
                 SeenJobsTable,
+            )
+        }
+    }
+
+    internal fun ensureWritableDatabaseFile(databasePath: String) {
+        val file = File(databasePath)
+        val dir = file.parentFile ?: File(".")
+        if (!dir.exists() && !dir.mkdirs()) {
+            error("Cannot create database directory: ${dir.absolutePath}")
+        }
+        if (!dir.canWrite()) {
+            error(
+                "Database directory is not writable: ${dir.absolutePath}. " +
+                    "The process uid must be able to create ${file.name} (Docker: chown 1000:1000 the volume).",
             )
         }
     }

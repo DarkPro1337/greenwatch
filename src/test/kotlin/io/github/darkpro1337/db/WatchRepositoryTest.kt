@@ -56,4 +56,15 @@ class WatchRepositoryTest {
         assertFalse(repo.deactivateWatch(42L, watch.id))
         assertTrue(repo.listWatches(42L).isEmpty())
     }
+
+    @Test
+    fun `creates missing parent directory for sqlite file`() {
+        val dir = File(dbFile.parentFile, "nested-${System.nanoTime()}")
+        val nested = File(dir, "greenwatch.db")
+        assertFalse(dir.exists())
+        DatabaseFactory.ensureWritableDatabaseFile(nested.absolutePath)
+        assertTrue(dir.isDirectory)
+        assertTrue(dir.canWrite())
+        dir.deleteRecursively()
+    }
 }
